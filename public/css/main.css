@@ -1,0 +1,1057 @@
+/**
+ * Global CSS
+ */
+legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 21px;
+    font-size: 22.5px;
+    line-height: inherit;
+    color: #ebebeb;
+    border: 0;
+    border-bottom: 1px solid #fff;
+}
+
+.btn, .form-control{
+    border-radius: 0 !important;
+}
+
+.alert {
+    color: #fff;
+}
+
+.alert-info {
+    background-color: #5bc0de;
+    border-color: transparent;
+    color: #ebebeb;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 21px;
+    border: 1px solid transparent;
+    border-radius: 0;
+}
+
+/**
+ * Plate CSS
+ */
+
+#plate_title {
+    margin-left: 20px;
+}
+
+#search_plate {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#close_plate {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#plate_title_sperator {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+/**
+ * Tool CSS
+ */
+
+.tool_item_sperator {
+    margin: 10px auto;
+}
+
+/**
+ * Support CSS
+ */
+
+#support_types td {
+    width: 80px;
+    height: 30px;
+    text-align: center;
+}
+
+#support_add_box .form-group {
+    width: 33%;
+    float: left;
+    padding: 0 2%;
+}
+
+
+#support_add {
+    margin-top: 20px;
+}
+
+/**
+ * Operation CSS
+ */
+
+.z_up {
+    height: 90px;
+    line-height: 90px;
+    border-top-left-radius: 60px;
+    border-top-right-radius: 60px;
+    border: 1px solid #fff;
+}
+
+.home {
+    height: 50px;
+    line-height: 50px;
+    background: #ff9247 !important;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #fff;
+}
+
+.z_down {
+    height: 90px;
+    line-height: 90px;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+    border: 1px solid #fff;
+}
+
+.z_calib_list {
+    padding-top: 56px;
+}
+
+.z_calib_list p:hover{
+    background: #1E9FFF;
+    cursor:pointer;
+}
+
+.z_calib_item_active{
+    background: #1E9FFF !important;
+}
+
+/**
+ * Print CSS
+ */
+#layer_details .key {
+    font-weight: bold;
+    width: 100px;
+    display: inline-block;
+    font-size: small;
+}
+
+#layer_details .val {
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: small;
+}
+
+#print_progress_bar, #print_status_bar {
+    border-radius: 0;
+    margin-bottom: 5px;
+}
+
+.stat-bar .part {
+    display: block;
+    line-height: 21px;
+    overflow: hidden;
+    float: left;
+    text-align: center;
+    white-space: nowrap;
+    width: 0;
+}
+
+label, .radio label, .checkbox label, .help-block {
+    font-size: 13px;
+    font-weight: 300;
+    color: white;
+}
+
+#support_preview {
+    width: 162px;
+    height: 60px;
+}
+
+#right_navbar {
+    margin-right: -25px;
+}
+
+.selected_sidebar_item {
+    filter: invert(50%) sepia(86%) saturate(556%) hue-rotate(150deg) brightness(105%) contrast(107%);
+}
+
+#items {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    background: #333;
+    width: 130px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 9999;
+    display: none;
+}
+
+#items .item {
+    padding: 5px 10px;
+}
+
+#items .remove {
+    color: red;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.support a {
+    color: #6ff;
+}
+
+#items .copy {
+    color: orange;
+    font-weight: bold;
+    margin-left: 5px;
+    visibility: hidden;
+}
+
+.profile_list_button, .plate_list_item_button {
+    width: 85px;
+}
+
+.tool_view_button {
+    width: 70px;
+}
+
+.plate_load {
+    position: absolute;
+    top: 30%;
+    left: 35%;
+    background: #333;
+    overflow: auto;
+    padding: 20px;
+    width: 500px;
+    z-index: 99999;
+    display: none;
+}
+
+.plate-edit-button {
+    margin: 20px 0 0 0;
+}
+
+.plate-edit .container-fluid{
+    margin:0;
+    padding:0;
+}
+
+.plate_load_group {
+    padding-top:5px !important;
+    padding-bottom:5px !important;
+    padding-left:0;
+    padding-right:0;
+}
+
+.plate_load_group button {
+    width: 80px;
+}
+
+.preview dt {
+    text-align: left !important;
+    width: 120px !important;
+}
+
+.preview dd {
+    margin-left: 140px !important;
+}
+
+html body {
+    color: #fff !important;
+    height:100%;
+}
+
+input {
+    color: #0f0f0f !important;
+}
+
+.top-nav{
+    height: 60px;
+    line-height: 30px;
+    border-radius: 0;
+    background: #333;
+}
+
+.navbar {
+    position: absolute !important;
+    top: 0;
+    width: 100%;
+	margin-bottom: 0;
+	border: none;
+}
+
+.top-nav .navbar-nav > li > a{
+    height: 60px;
+    line-height: 30px;
+    font-size: 16px;
+    font-weight: 300;
+    color: #ccc;
+}
+
+.top-nav .container-fluid{
+    padding-left:50px;
+    padding-right:50px;
+}
+
+.navbar-logo{
+    padding:10px 15px 0 15px;
+}
+
+.top-nav-right img{
+    height:100%;
+}
+
+.navbar-logo img{
+    height: 100%;
+}
+
+.content{
+
+}
+
+.content-image{
+    width:100%;
+}
+
+.sidebar {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    background: #333;
+    width: 150px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+
+.sidebar li {
+    height: 13%;
+}
+
+.sidebar a {
+    display: block;
+}
+
+.sidebar .sidebar_img_wrapper img {
+    height: 35%;
+}
+
+.sidebar a:hover, .sidebar a:focus{
+    background: #333 !important;
+}
+
+.sidebar .sidebar_item_name {
+    margin-top:10px;
+}
+
+.sidebar_item_name{
+    color:#fff;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.plate-tools-footer{
+    padding-top:20%;
+}
+
+.search{
+    background: #00a5e2;
+}
+
+#close_plate, #support_close, #support-edit-close, #operation_close, #resin-close, #plate_load_close, #preview-close, #print-close{
+    color: #333;
+}
+
+.modal_close{
+    margin:5px 10px;
+}
+
+.close{
+    width:25px;
+    height:25px;
+    background: #fff !important;
+}
+
+#plate {
+    top: 10%;
+    overflow: auto;
+}
+
+#plate .modal-content {
+    background: #333;
+    color: #fff;
+}
+
+.plate-group {
+
+    overflow: auto;
+}
+
+.plate-title {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.plate-list .plate-list-title {
+    height: 50px;
+    line-height: 50px;
+}
+
+.plate-list .plate-list-item-title {
+    height: 50px;
+    line-height: 50px;
+    background: #00a5e2;
+}
+
+.plate-list .plate-list-item-content {
+    min-height: 30px;
+    background: #fff;
+    padding: 10px 0;
+    color: #333;
+    font-size: 13px;
+}
+
+.plate-list .plate-list-item-action {
+    padding: 10px 0;
+}
+
+.plate-list-item-button {
+    display: none;
+}
+
+.tool {
+    position: absolute;
+    width: 300px;
+    top: 80px;
+    right: 180px;
+    background: #333;
+    font-size: 16px;
+    font-weight: 300;
+    display: none;
+}
+
+.tool .container-fluid button {
+    width: 70px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+#tool_close{
+    color: #333;
+    margin:5px 5px 0;
+}
+
+.tool .container-fluid button {
+    width: 70px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.tool input {
+    margin: 5px auto;
+}
+
+.default-font {
+    font-size: 12px;
+    font-weight: 100;
+    margin:0;
+    padding:0;
+}
+
+.keep_scale_ratio_group{
+    margin-top:10px;
+}
+
+#keep_scale_ratio{
+    width:20px;
+}
+
+.tool-item-title{
+    margin-top:20%;
+}
+
+.tool-item-title-view{
+    margin-top:9%;
+}
+
+.kee-ratio{
+    margin-top:0 !important
+}
+
+.default-font input{
+    margin:0;
+    padding:0;
+    width:0 !important;
+}
+
+.tool-apply {
+    margin-bottom: 20px;
+}
+
+.tool-group{
+    position: relative;
+}
+
+.tool-button-group {
+    display: inline-block;
+    position: absolute;
+    bottom: 7px;
+    right:3px;
+
+}
+
+.tool-info{
+    width:30px;
+    display: inline-block;
+    position: absolute;
+    bottom: 7px;
+    right:30px;
+    text-align: center;
+}
+
+.tool-info p {
+    background: #fff;
+    height: 13px;
+    color: #0f0f0f;
+    font-size: 12px;
+    margin: 1px 0 0 0;
+    padding: 0;
+    cursor:pointer;
+}
+
+.tool-button {
+    display: block;
+    background: #fff;
+    padding: 1px;
+    margin-top: 2px;
+}
+
+.tool-button img {
+    width: 15px;
+}
+
+.tool_move_group input, .tool_rotate_group input, .tool_scale_group input {
+    width: 85%;
+}
+
+.tool-title, .tool-input {
+    display: inline-block;
+}
+
+.tool-input {
+    width: 50%;
+}
+
+.support {
+    position: absolute;
+    width: 300px;
+    top: 80px;
+    right: 180px;
+    background: #333;
+    font-size: 16px;
+    font-weight: 300;
+    overflow: auto;
+    padding: 20px;
+    display: none;
+}
+
+.support .details img{
+    height:25px;
+    width: 140px;
+}
+
+.object_Reset button {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.support-close {
+    margin-top: -15px;
+    margin-right: -15px;
+    margin-bottom: 10px;
+    color:#fff;
+}
+
+.support-edit {
+    position: absolute;
+    top: 30%;
+    right: 500px;
+    background: #333;
+    font-size: 16px;
+    font-weight: 300;
+    overflow: auto;
+    padding: 20px;
+    display: none;
+    max-width: 600px;
+}
+
+.support-edit p {
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+.input-group-btn-vertical {
+    position: relative;
+    white-space: nowrap;
+    width: 15%;
+    vertical-align: middle;
+    display: table-cell;
+    color: #0f0f0f;
+}
+
+.input-group-btn-vertical > .btn {
+    display: block;
+    float: none;
+    width: 100%;
+    max-width: 100%;
+    padding: 8px;
+    margin-left: -1px;
+    position: relative;
+    border-radius: 0;
+}
+
+.input-group-btn-vertical > .btn:first-child {
+    border-top-right-radius: 4px;
+}
+
+.input-group-btn-vertical > .btn:last-child {
+    margin-top: -2px;
+    border-bottom-right-radius: 4px;
+}
+
+.input-group-btn-vertical i {
+    position: absolute;
+    top: 0;
+    left: 4px;
+}
+
+.support-edit-button {
+    margin-top: 30px;
+}
+
+.support-edit-button img {
+    width: 80%;
+}
+
+.support-edit-close {
+    margin-top: -15px;
+    margin-right: -15px;
+    margin-bottom: -20px;
+    color: red;
+}
+
+.operation {
+    position: absolute;
+    bottom: 10px;
+    right: 180px;
+    background: #333;
+    margin: 0;
+    padding: 20px;
+    display: none;
+    width:440px;
+    height:635px;
+}
+
+.control-panel {
+    width: 400px;
+    height: 150px;
+    background: #000;
+}
+
+.boundaries, .full-white {
+    border: 1px solid #fff;
+}
+
+.boundaries img, .full-white img {
+    padding: 10px;
+}
+
+.control-button {
+    text-align: center;
+    margin: 10px;
+}
+
+.control-button a {
+    padding: 5px 15px;
+    color:#fff;
+}
+
+.control-button a:hover {
+    color:#fff;
+}
+
+.control-left p {
+    padding-left: 10px;
+}
+
+.control-right {
+    margin-left: 10px;
+}
+
+.z_control {
+    border: 1px solid #fff;
+    width: 100%;
+    height: 350px;
+    overflow: auto;
+    padding: 50px 10px 20px 10px;
+}
+
+.control-right p {
+    background: #5cbb5c;
+    border: 1px solid #fff;
+    padding: 0 5px;
+    text-align: center;
+    color: #0f0f0f;
+}
+
+.control-z {
+    margin-left: 30px;
+}
+
+.control-z a {
+    display: block;
+    width: 110px;
+    background: #5cbb5c;
+    text-align: center;
+    font-size: 24px;
+    color: #0f0f0f;
+}
+
+.control-z a:hover {
+    text-decoration: none;
+}
+
+
+
+.current {
+    margin-top: 28px;
+}
+
+.resin {
+    position: absolute;
+    top: 20%;
+    left: 15%;
+    right: 180px;
+    background: #333;
+    margin: 0;
+    padding: 20px;
+    width: 1200px;
+    white-space: nowrap;
+    display: none;
+}
+
+.resin-list {
+    margin: 0;
+    padding: 0;
+}
+
+.resin-list-title {
+    font-size: 16px;
+    font-weight: 300;
+    margin: 2px auto;
+}
+
+.resin-list-content {
+    background: #fff;
+    color: #0f0f0f;
+    margin: 2px auto;
+    padding: 10px 0;
+    font-size: 12px;
+}
+
+.resin-list-bottom {
+    margin-top: 10px;
+}
+
+.resin-list-bottom button {
+    margin-right: 10px;
+    padding: 2px 10px;
+    border-radius: 0;
+    color: #fff !important;
+    font-size: 16px;
+}
+
+.resin_edit {
+    position: absolute;
+    top: 10%;
+    left: 25%;
+    background: #333;
+    font-weight: 300;
+    overflow: auto;
+    padding: 20px;
+    width:800px;
+    display: none;
+}
+
+.resin_edit .label {
+    font-weight: 300;
+}
+
+.preview {
+    position: absolute;
+    height:450px;
+    width: 780px;
+    right: 10px;
+    bottom: 10px;
+    background: #333;
+    overflow: auto;
+    padding: 20px;
+    display: none;
+}
+
+.preview-panel {
+    background: #0f0f0f;
+    width: 480px;
+    height: 270px;
+}
+
+.preview-button {
+    margin-top: 10px;
+}
+
+.preview-left {
+    margin-right: 20px;
+}
+
+.preview-right {
+    width: 220px;
+    height: 290px;
+    font-size: 10px;
+    padding: 1px 0 0 0;
+    margin: 0 -10px 0 0;
+    overflow: auto;
+}
+
+.preview-title {
+    color: #1E9FFF;
+}
+
+.slicing{
+    top:10%;
+}
+
+.slicing .modal-content{
+    background: #333;
+    padding: 10px;
+    width: 500px;
+}
+
+.slicing .progress {
+    height: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.slicing-button {
+    margin-top: 20px;
+}
+
+.print {
+    position: absolute;
+    bottom: 10px;
+    right: 180px;
+    background: #333;
+    overflow: auto;
+    padding: 20px 30px;
+    width: 500px;
+    height:508px;
+    display: none;
+}
+
+.print-info {
+    margin-left: 50px
+}
+
+.print-info p {
+    margin: 0;
+    padding: 0;
+    font-size: 11px;
+}
+
+.print-panel {
+    margin-top: 10px;
+    width: 440px;
+    height: 240px;
+    background: #0f0f0f;
+}
+
+.print-info-title {
+    display: inline-block;
+    width: 80px;
+}
+
+.print_button div {
+    margin-top: 5px;
+    padding: 0;
+}
+
+.print_button button {
+    width: 90%;
+}
+
+.wifi-control {
+    position: relative;
+}
+
+.wifi-container{
+    width: 290px;
+    overflow-x: hidden;
+    height: 546px;
+    position: absolute;
+    display: none;
+}
+
+ul.wifi {
+    /*position: absolute;*/
+    list-style: none;
+    margin: -1px 0 0 0;
+    padding: 5px 0 0 0;
+    background: #333;
+    font-size: 12px;
+    max-height: 500px;
+    overflow-y: scroll;
+    width: 310px;
+    /*display: none;*/
+}
+
+ul.wifi li {
+    margin: 0;
+    padding: 10px;
+    height: 45px;
+    line-height: 25px;
+    min-width: 290px;
+    width: 290px;
+}
+
+ul.wifi li:hover {
+    background: #7f7f7f;
+}
+
+.wifi-items{
+    cursor:pointer;
+}
+
+.wifi-title {
+    margin-right: 20px;
+}
+
+.wifi-hr:hover, .wifi-button:hover {
+    background: #333 !important;
+}
+
+.wifi-hr {
+    margin: 0 5px !important;
+    padding: 0 !important;
+    height: 1px !important;
+}
+
+.wifi-hr hr {
+    margin: 0;
+    padding: 0;
+}
+
+.wifi-button {
+    height: 45px;
+    line-height: 25px;
+    min-width: 290px;
+    /*position: absolute;
+    top: 499px;*/
+    background: #333;
+    padding: 10px 30px;
+    /*margin: auto 20px !important;*/
+}
+
+.wifi-ssid{
+    width: 125px!important;
+    height: 20px;
+    display: block;
+    float: left;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.wifi-password {
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    z-index: 9;
+    background: #333;
+    overflow: auto;
+    padding: 20px;
+    width: 400px;
+    display: none;
+}
+
+.wifi-password .input-group-addon {
+    padding: 0 10px 0 0;
+    color: #fff;
+    border: 0;
+    background: none;
+}
+
+.wifi-password input {
+    border-radius: 0;
+}
+
+.wifi-password-button {
+    margin: 20px 0 0 150px;
+}
+
+.wifi-password-button button {
+    margin-right: 40px;
+}
+
+.wifi-connect {
+    background: #7f7f7f !important;
+}
+
+.plate-edit-button {
+    margin: 20px 0 0 0;
+}
+
+.plate-name-edit-input{
+    height:30px;
+    line-height: 30px;
+    width:200px;
+    display: none;
+}
+
+.plate-name-edit-button{
+    display: inline-block;
+    padding-left:5px;
+    height:20px;
+}
+
+.plate-name-edit-button img{
+    height: 100%;
+}
+
+/*plate edit*/
+.plate-edit {
+    position: fixed;
+    top: 30%;
+    background: #333;
+    overflow: auto;
+    padding: 20px;
+    width: 600px;
+    display: none;
+    z-index: 99999;
+}
+
+.plate-edit .form-group {
+    width: 33%;
+    float: left;
+    padding: 0 2%;
+}
+
+.plate-edit-close{
+    color: #333;
+}

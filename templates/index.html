@@ -1,0 +1,880 @@
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <link href="/static/boot3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+    <title>Geeetech DP Series</title>
+</head>
+<body>
+
+<audio id="buzzer" src="/static/alert.ogg" type="audio/ogg"></audio>
+
+<!-- Plate 弹窗 -->
+<div class="modal fade pop_window" tabindex="-1" role="dialog" id="plate" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 id="plate_title">Plate List</h3>
+                </div>
+                <div class="col-md-3">
+                    <input id="search_plate" type="text" class="form-control">
+                </div>
+                <div class="col-md-1">
+                    <button id="close_plate" data-toggle="modal" data-target="#plate"
+                            onclick="on_click_close('plate');"><span>&times;</span></button>
+                </div>
+            </div>
+            <div class="row">
+                <div id="plate_title_sperator" class="clearfix">
+                    <hr>
+                    <!-- {% if Plates %}
+                        {% for row in Plates %}{% if row.PlateID != 0 %}
+                        plateID:{{row.PlateID}}
+                        path:{{row.Path}}
+                        X:{{row.XRes}}μm  {{row.Xmin}}mm {{row.Xmax}}mm
+                        Y:{{row.YRes}}μm 
+                        Z:{{row.ZRes}}μm
+                        profile:{{row.ProfileName}}
+                        cureTime:{{row.cureTime}}
+                        process:{{row.Processed}}
+                        layerscount:{{row.LayersCount}}
+                        preview:{{row.Preview}}
+
+                        {% for key,value in row %}
+                        --{{key}} ++{{value}}
+                        {% endfor %}
+                        
+                        {% endif %}{% endfor %}
+                    {% else %}
+                        there is no Plates {{Plates}}
+                    {% endif %} -->
+                </div>
+            </div>
+            <div class="modal-body">
+                <translate class="hide" id="delete_plate_confirm">Are you sure you want to delete this plate?</translate>
+                <div class="row plate-title text-center">
+                    <div class="col-md-2">ID</div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-9">Plate Name</div>
+                </div>
+                <div class="plate-group">
+                {% if Plates %}
+                    {% for row in Plates %}{% if row.PlateID != 0 %}
+                    <div class="container-fluid plate-list" id="plate-list-item-{{row.PlateID}}">
+                        <div class="plate-list-item">
+                            <div onclick="show_action_button({{row.PlateID}})">
+                                <div class="row plate-list-item-title text-center">
+                                    <div class="col-md-2">{{row.PlateID}}</div>
+                                    <div class="col-md-1">|</div>
+                                    <div id="plate_name" class="col-md-9">{{row.Path}}</div>
+                                </div>
+                                <div class="row plate-list-item-content">
+                                    <div class="col-md-12">
+                                        <!-- <p>Model Size: 110.0 mm  27.3 mm  57.4 mm</p> -->
+                                        <p>X:{{row.XRes}}μm Y:{{row.YRes}}μm Z:{{row.ZRes}}μm</p>
+                                        <p>Profile: {{row.ProfileName}}</p>
+                                        <p>Layer CureTime: {{row.cureTime}} s</p>
+                                        {% if row.Preview %}<img src="static/plates/{{row.PlateID}}/3d.png">{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row plate-list-item-action">
+                                <div class="col-md-12 text-right plate-list-item-button" id="plate-action-{{row.PlateID}}" style="display: block;">
+                                    <button class="plate_list_item_button btn btn-primary" onclick="on_apply_plate({{row.PlateID}}, '{{row.Path}}','{{row.Processed}}', {{row.LayersCount}});">3D View</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button class="plate_list_item_button btn btn-warning" onclick="on_edit_plate({{row.PlateID}},'{{row.Path}}',{{row.AutoCenter}},'{{row.StopLayers}}',{{row.LowQualityLayerNumber}},{{row.ImageRotate}},{{row.MaskEffect}});">Edit</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button class="plate_list_item_button btn btn-danger ask" data-ask="delete_plate_confirm" onclick="on_delete_plate({{row.PlateID}})">Delete</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a class="plate_list_item_button btn btn-success" href="/plate/download/{{row.PlateID}}">Download</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}{% endfor %}
+                {% else %}
+                there is no Plates
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="plate_edit pop_window plate-edit modal-dialog modal-lg" id="plate_edit">
+    <div class="plate-close">
+        <div class="pull-left"><h4>Edit Plate</h4></div>
+        <div class="pull-right">
+            <button class="plate-edit-close" onclick="close_pop('#plate_edit')"><span>×</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <form id="plate_form" enctype="multipart/form-data">       <!--  action="{% if file!="" %}/plate/add-usb{% endif %}"-->
+        {% if file=="" %}
+        <div class="form-group">
+            <label for="ZipFile"><translate>Plate File</translate> <span class="label label-default" translate>STL, SLC, SVG, NanoDLP or Zip (PNG Files)</span></label>
+            <input name="ZipFile" class="form-control" id="ZipFile" type="file" accept=".zip,.slc,.svg,.stl,.cws,.nanodlp" {% if not plate.PlateID %}required{% endif %}>
+        </div>
+        {% else %}
+        <input type="hidden" name="USBFile" class="form-control" value="{{file}}">
+        {% endif %}
+        <div class="form-group">
+            <label for="Path" translate>Plate Name</label>
+            <input value="1" name="Path" id="Path1" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="ProfileID" translate="">Profile</label>
+            <select name="ProfileID" id="ProfileID" class="form-control">
+                {% for profile in Profiles %}
+                    <option value="{{profile.ProfileID}}" {% if (defaultProfile == profile.ProfileID) %}selected{% endif %}>{{profile.Title}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="AutoCenter">
+                <translate>Auto Center</translate>
+            </label>
+            <select name="AutoCenter" id="AutoCenter" class="form-control">
+                <option value="0" translate="">Center Pieces</option>
+                <option value="1" translate="">Center Origin</option>
+                <option value="2" translate="">Disable</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="StopLayers" style="margin: 12px 0px;"><translate>Stop Layers</translate>
+                <span class="label label-default" translate="">Optional</span>
+            </label>
+            <input value="1" class="form-control" name="StopLayers" id="StopLayers" pattern="[\d,]*">
+        </div>
+        <div class="form-group">
+            <label for="LowQualityLayerNumber">
+                <translate>Number of Low Quality Layers</translate> <span class="label label-default" translate="">Optional</span> 
+            </label>
+            <input class="form-control" value="" name="LowQualityLayerNumber" id="LowQualityLayerNumber" type="number">
+        </div>
+        {% if file=="" %}
+            <div class="form-group">
+                <label for="MaskFile"><translate>Mask File (PNG)</translate> <span class="label label-default" translate>Optional, override global mask</span></label>
+                <input name="MaskFile" class="form-control" id="MaskFile" type="file" accept=".png">
+            </div>
+            <div class="form-group">
+                <label for="MaskEffect"><translate>Decrease Mask Intensity</translate> <span class="label label-default" translate>Percentage</span></label>
+                <input name="MaskEffect" class="form-control" id="MaskEffect" type="number" step="0.1" min="0" max="100" value="">
+            </div>
+        {% endif %}
+        <div class="form-group">
+            <label for="ImageRotate" translate="" style="margin: 11px 0px;">Rotate Layers</label>
+            <select class="form-control" name="ImageRotate" id="ImageRotate">
+                <option value="0"  translate>Same as Profile</option>
+                <option value="1"  translate>Do not Rotate</option>
+                <option value="2"  translate>Rotate 90°</option>
+            </select>
+        </div>
+        <div style="clear:both;"></div>
+        <div>
+            <input type="submit" id="plate_edit_submit" value="Submit" class="btn btn-success">
+        </div>
+    </form>
+</div>
+    
+
+<div class="plate_load pop_window" id="load">
+    <div class="tool-close">
+        <div class="pull-right">
+            <button id="plate_load_close" onclick="close_pop('#load')"><span>&times;</span></button>
+        </div>
+    </div>
+    <legend>Load Plate</legend>
+    <form class="edit-page" enctype="multipart/form-data">
+        <div class="plate_load_group row">
+            <div class="col-md-6">
+                <label for="Path">Plate Name</label>
+                <input class="form-control" name="Path" id="Path" placeholder="Plate Name" required>
+            </div>
+            <div class="col-md-6">
+                <label for="ZipFile">File (ZIP/STL)</label>
+                <input name="ZipFile" class="form-control" id="ZipFile" type="file" accept=".zip,.stl" required>
+            </div>
+        </div>
+        <div class="plate_load_group row">
+            <div class="col-md-12">
+                <label for="ProfileID">Profile</label>
+                <select id="load_profile_list" name="ProfileID" class="form-control">
+
+                </select>
+            </div>
+        </div>
+        <br>
+        <div class="plate_load_group col-md-3"></div>
+        <div class="plate_load_group col-md-3 text-center">
+            <button class="btn btn-success" onclick="on_load_plate();">Submit</button>
+        </div>
+        <div class="plate_load_group col-md-3 text-center">
+            <button class="btn btn-warning" onclick="close_pop('#plate_load')">Cancel</button>
+        </div>
+        <div class="plate_load_group col-md-3"></div>
+    </form>
+</div>
+
+<!-- Tool 弹窗 -->
+<div class="tool pop_window" id="tool">
+    <div class="modal_close">
+        <div class="pull-left"><h4>Tool</h4></div>
+        <div class="pull-right">
+            <button id="tool_close" onclick="on_click_close('tool')"><span>&times;</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="container-fluid">
+        <div class="row tool-item-group">
+            <div class="col-md-4 tool-item-title-view">View</div>
+            <div class="col-md-8">
+                <div class="text-center">
+                    <button data-x="0" data-y="0" data-z="300" data-reset="true" class="cam-change btn btn-success btn-xs tool_view_button">Top</button>
+                    <button data-x="0" data-y="200" data-z="20" data-reset="true" class="cam-change btn btn-success btn-xs tool_view_button">Front</button>
+                </div>
+                <div class="text-center">
+                    <button data-x="0" data-y="50" data-z="-150" data-reset="true" class="cam-change btn btn-success btn-xs tool_view_button">Bottom</button>
+                    <button class="cam-reset btn btn-info btn-xs tool_view_button">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div class="tool_item_sperator">
+            <hr>
+        </div>
+        <div class="row tool-item-group">
+            <div class="col-md-4 tool-item-title">Move</div>
+            <div class="col-md-8 tool_move_group">
+                <div class="tool-group">
+                    X <input type="number" class="input-sm" id="tool_move_x" step="1" disabled>
+                </div>
+                <div class="tool-group">
+                    Y <input type="number" class="input-sm" id="tool_move_y" step="1" disabled>
+                </div>
+                <div class="tool-group">
+                    Z <input type="number" class="input-sm" id="tool_move_z" step="1" disabled>
+                </div>
+                <div class="text-center">
+                    <button id="tool_move_center" class="btn btn-warning btn-xs">Center</button>
+                    <button id="tool_move_reset" class="btn btn-info btn-xs">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div class="tool_item_sperator">
+            <hr>
+        </div>
+        <div class="row tool-item-group">
+            <div class="col-md-4 tool-item-title">Scale</div>
+            <div class="col-md-8 tool_scale_group">
+                <div class="tool-group">
+                    X <input type="number" class="input-sm greater-than-0" id="tool_scale_x" step="0.1" disabled>
+                </div>
+                <div class="tool-group">
+                    Y <input type="number" class="input-sm greater-than-0" id="tool_scale_y" step="0.1" disabled>
+                </div>
+                <div class="tool-group">
+                    Z <input type="number" class="input-sm greater-than-0" id="tool_scale_z" step="0.1" disabled>
+                </div>
+                <div class="text-center">
+                    <button id="tool_scale_reset" class="btn btn-info btn-xs">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div class="tool_item_sperator">
+            <hr>
+        </div>
+        <div class="row tool-item-group">
+            <div class="col-md-4 tool-item-title">Rotate</div>
+            <div class="col-md-8 tool_rotate_group">
+                <div class="tool-group">
+                    X <input type="number" class="input-sm" id="tool_rotate_x" step="90" disabled>
+                </div>
+                <div class="tool-group">
+                    Y <input type="number" class="input-sm" id="tool_rotate_y" step="90" disabled>
+                </div>
+                <div class="tool-group">
+                    Z <input type="number" class="input-sm" id="tool_rotate_z" step="90" disabled>
+                </div>
+                <div class="text-center">
+                    <button id="tool_rotate_reset" class="btn btn-info btn-xs">Reset</button>
+                </div>
+            </div>
+        </div>
+        <div class="tool_item_sperator">
+        </div>
+    </div>
+</div>
+
+<!-- Support 弹窗 -->
+<div class="support pop_window" id="support">
+    <div class="support-close">
+        <div class="pull-left"><h4>Support</h4></div>
+        <div class="pull-right">
+            <button id="support_close" onclick="on_click_close('support')">
+                <span>&times;</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div id="support_types"></div>
+    <div class="clearfix">
+        <hr>
+    </div>
+    <div>
+        <input type="text" class="form-control" placeholder="Max Distance" id="max_dist">
+        <input type="text" class="form-control" placeholder="Diameter" id="weaver_dia">
+        <button id="Weaver" value="Weave Supports" class="btn btn-info form-control">Weave Supports</button>
+        <div class="clear"></div>
+        <br>
+        <button id="unify_base" value="Unify Supports" class="btn btn-info form-control">Unify Supports</button>
+    </div>
+    <div class="clear"></div>
+</div>
+
+<!-- Support Edit 弹窗 -->
+<div class="support-edit pop_window" id="support_add_box">
+    <div class="support-close">
+        <div class="pull-left"><h4>Support Detail</h4></div>
+        <div class="pull-right">
+            <button id="support-edit-close" onclick="close_pop('#support_add_box')"><span>&times;</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <form id="support_add">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input name="name" placeholder="Name" class="form-control" required></td>
+        </div>
+        <div class="form-group">
+            <label for="type">Support Type:</label>
+            <select name="type" class="form-control toggle_master">
+                <option value="0">Model to Floor</option>
+                <option value="1">Bridge</option>
+            </select>
+        </div>
+        <div class="form-group type_0">
+            <label for="head_dia">Head Radius:</label>
+            <input class="form-control" name="head_dia" placeholder="Head Radius" type="number" step="0.1">
+        </div>
+        <div class="form-group type_0">
+            <label for="head_len">Head Length:</label>
+            <input class="form-control" name="head_len" placeholder="Head Length" type="number" step="0.1">
+        </div>
+        <div class="form-group type_0">
+            <label for="head_type">Head Type:</label>
+            <select class="form-control" name="head_type">
+                <option value="0">Cone</option>
+                <option value="1">Sphere</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="head_len">Head Peneteration:</label>
+            <input class="form-control" name="penetration" placeholder="Peneteration" type="number" step="0.1">
+        </div>
+        <div class="form-group type_0">
+            <label for="head_len">Base Radius:</label>
+            <input class="form-control" name="base_dia" placeholder="Base Radius" type="number" step="0.1">
+        </div>
+        <div class="form-group type_0">
+            <label for="head_len">Base Depth:</label>
+            <input class="form-control" name="base_len" placeholder="Base Depth" type="number" step="0.1">
+        </div>
+        <div class="form-group">
+            <label for="head_len">Body Radius:</label>
+            <input class="form-control" name="body_dia" placeholder="Body Radius" required type="number" step="0.1">
+        </div>
+        <div class="clear"></div>
+        <div class="form-group only_new">
+            <br>
+            <canvas id="support_preview"></canvas>
+        </div>
+        <div class="form-group only_new">
+            <br>
+            <input class="form-control btn-warning" type="submit" value="Save">
+        </div>
+        <div class="form-group only_new">
+            <br>
+            <input class="form-control btn-danger" type="submit" value="Remove">
+        </div>
+        <div class="clear"></div>
+    </form>
+</div>
+
+<!-- Model list -->
+<translate class="hide" id="delete_model_confirm">Are you sure you want to delete this model(not support)?</translate>
+<div id="items" style="display: none;"></div>
+
+<!-- Operation -->
+<div class="operation pop_window" id="operation">
+    <div class="support-close">
+        <div class="pull-left"><h4>Control</h4></div>
+        <div class="pull-right">
+            <button id="operation_close" onclick="on_click_close('operation')">
+                <span>&times;</span>
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="control-panel" id="terminal"></div>
+    <div class="control-panel-action">
+        <div class="input-group">
+            <input id="gcode" type="text" class="form-control">
+            <span class="input-group-btn">
+                <button id="send_gcode" class="btn btn-primary" type="button">G-Code</button>
+            </span>
+        </div>
+    </div>
+    <div class="control-left pull-left">
+        <h4 class="control-left-title">Projector</h4>
+        <div class="boundaries">
+            <div><img src="../static/image/logo-black.png"></div>
+            <p>Boundaries</p>
+            <div class="control-button boundaries-button">
+                <a id="show_boundaries" class="btn btn-warning" href="/projector/generate/boundaries">Display</a>
+                <a id="hide_boundaries" class="btn" href="/projector/blank">Close</a>
+            </div>
+        </div>
+        <div class="full-white">
+            <div><img src="../static/image/logo-white.png"></div>
+            <p>Full White</p>
+            <div class="control-button full-white-button">
+                <a id="show_full_white" class="btn btn-warning" href="/projector/generate/white">Display</a>
+                <a id="hide_full_white" class="btn" href="/projector/blank">Close</a>
+            </div>
+        </div>
+    </div>
+    <div class="control-right pull-left">
+        <h4 class="control-right-title">Z aixs Calibration</h4>
+        <div class="z_control">
+            <div class="z_content">
+                <div class="pull-left z_calib_list">
+                    <p id="calib_01" class="z_calib_item" value="100">0.1mm</p>
+                    <p id="calib_1" class="z_calib_item z_calib_item_active" value="1000">1mm</p>
+                    <p id="calib_10" class="z_calib_item" value="10000">10mm</p>
+                    <p id="calib_50" class="z_calib_item" value="50000">50mm</p>
+                </div>
+                <div class="pull-right control-z">
+                    <a href="#" id="z_up" class="z_up">Z<span class="glyphicon glyphicon-arrow-up"></span></a>
+                    <a href="#" id="home" class="home">Home</a>
+                    <a href="#" id="z_down" class="z_down">Z<span class="glyphicon glyphicon-arrow-down"></span></a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="current">Current:</div>
+        </div>
+    </div>
+</div>
+
+<!-- Resin -->
+<div class="resin pop_window" id="resin">
+    <div class="pull-right">
+        <button id="resin-close" onclick="close_pop('#resin')"><span>&times;</span></button>
+    </div>
+    <legend>Resin Setting</legend>
+    <div class="container-fluid resin-list" style="text-align: center;">
+    </div>
+    <div class="row resin-list-bottom">
+        <div class="col-md-12">
+            <button class="btn btn-success resin-add-control" onclick="open_pop('#resin-add');">Add Profile</button>
+            <button class="btn btn-success">Import a Profile</button>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Resin Edit 弹窗 -->
+<div class="resin_edit pop_window" id="resin_edit">
+    <div class="pull-right">
+        <button id="resin-edit-close" onclick="close_pop('#resin_edit')"><span>&times;</span></button>
+    </div>
+    <legend>Edit Profile</legend>
+    <div class="alert alert-info">Setting changes will take effect immediately and dose not require restart.</div>
+    <form action="" method="post" class="edit-page" id="setup">
+        <h3>Burn-in Layers</h3>
+        <div class="row flex-row">
+            <div class="col-md-3">
+                <label for="SupportLayerNumber">Number of Layers</label>
+                <input class="form-control" value="0" name="SupportLayerNumber" id="SupportLayerNumber" type="number" required>
+            </div>
+            <div class="col-md-3">
+                <label for="SupportDepth">Layer Thickness
+                    <span class="label label-default">μm</span>
+                </label>
+                <input class="form-control" value="0" name="SupportDepth" id="SupportDepth" step="0.001" type="number" required>
+            </div>
+            <div class="col-md-3">
+                <label for="SupportCureTime">Cure Time
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="SupportCureTime" id="SupportCureTime" step="0.0001" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="SupportWaitBeforePrint">Wait Before Print
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="SupportWaitBeforePrint" step="0.01" id="SupportWaitBeforePrint" type="number" required>
+                <br>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="SupportWaitAfterPrint">Wait After Print
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="SupportWaitAfterPrint" step="0.01" id="SupportWaitAfterPrint" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="SupportWaitHeight">Lift After Print
+                    <span class="label label-default">Millimeter</span>
+                </label>
+                <input class="form-control" value="0" name="SupportWaitHeight" step="0.001" id="SupportWaitHeight" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="SupportTopWait">Wait After Lift
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="SupportTopWait" step="0.01" id="SupportTopWait" type="number" required>
+            </div>
+        </div>
+        <br>
+
+        <h3>Normal Layers</h3>
+        <div class="row flex-row">
+            <div class="col-md-3">
+                <label for="Depth">Layer Thickness
+                    <span class="label label-default" translate>μm</span>
+                </label>
+                <input class="form-control" value="0" name="Depth" id="Depth" step="0.001" type="number" required>
+            </div>
+            <div class="col-md-3">
+                <label for="CureTime">Cure Time
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="CureTime" id="CureTime" step="0.0001" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="WaitBeforePrint" class="tip">Wait Before Print
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="WaitBeforePrint" id="WaitBeforePrint" step="0.01" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="WaitAfterPrint">Wait After Print
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="WaitAfterPrint" id="WaitAfterPrint" step="0.01" type="number" required>
+                <br>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="WaitHeight" class="tip" data-tip="Separation distance">
+                    Lift After Print
+                    <span class="label label-default">Millimeter</span>
+                </label>
+                <input class="form-control" value="0" name="WaitHeight" id="WaitHeight" step="0.001" type="number" required>
+            </div>
+            <div class="col-md-3 conditional" data-condition="#SetupMode > 0">
+                <label for="TopWait">Wait After Lift
+                    <span class="label label-default">Second</span>
+                </label>
+                <input class="form-control" value="0" name="TopWait" id="TopWait" step="0.01" type="number" required>
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+
+<!-- Preview -->
+<div class="preview pop_window" id="preview">
+    <div class="support-close">
+        <div class="pull-left"><h4>Preview</h4></div>
+        <div class="pull-right">
+            <button id="preview-close" onclick="close_pop('#preview')"><span>&times;</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <h5 class="preview-title">Preview Layers of Plate (empty)</h5>
+    <div class="pull-left preview-left">
+        <div class="preview-panel">
+
+        </div>
+        <div class="preview_slider">
+            <input type="range" min="1" class="form-control">
+        </div>
+        <div class="preview-button">
+            <div class="pull-left">
+                <button class="btn btn-danger text-left">Display Layer On LED</button>
+            </div>
+            <div class="pull-right">
+                <button id="display-prev-layer" class="btn btn-success text-right"><</button>
+                <button id="display-next-layer" class="btn btn-success">></button>
+            </div>
+        </div>
+    </div>
+    <div class="pull-left preview-right">
+        <dl class="small dl-horizontal">
+            <dt>Current Layer</dt><dd><span id="currentLayer"></span></dd>
+            <dt>Area Count</dt><dd><span id="AreaCount"></span></dd>
+            <dt>Total Solid Area</dt><dd><span id="TotalSolidArea"></span></dd>
+            <dt>Largest Area</dt><dd><span id="LargestArea"></span></dd>
+            <dt>Smallest Area</dt><dd><span id="SmallestArea"></span></dd>
+            <dt>Boundry - X</dt><dd><span id="MinX"></span> - <span id="MaxX"></span></dd>
+            <dt>Boundry - Y</dt><dd><span id="MinY"></span> - <span id="MaxY"></span></dd>
+        </dl>
+    </div>
+</div>
+
+<!-- Slicing -->
+<div class="modal fade slicing pop_window plate" tabindex="-1" role="dialog" id="slicing" data-backdrop="static"
+     data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <h3 class="modal-title">Slicing</h3>
+            <div class="progress">
+                <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="60"
+                     aria-valuemin="0"
+                     aria-valuemax="100" style="width: 0;"></div>
+            </div>
+            <div class="slicing_task_info">File: (empty)</div>
+            <div class="slicing_task_status">Status: Idle</div>
+            <div class="slicing-button text-center">
+                <button id="save_to_dev" class="btn btn-success" disabled="disabled">Save to Device</button>&nbsp;&nbsp;
+                <button class="btn btn-danger" id="slice-cancel" data-toggle="modal" data-target="#slicing">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Printing -->
+<div class="print pop_window" id="print">
+    <div class="support-close">
+        <div class="pull-left"><h4>Print</h4></div>
+        <div class="pull-right">
+            <button id="print-close" onclick="close_pop('#print')"><span>&times;</span></button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="Printing">
+        <div id="layer_details">
+            <div class="key">Plate</div><div class="val last_path"></div><br>
+            <div class="key">Layer</div><div class="val last_location"></div><br>
+            <div class="key">Remaining</div><div class="val last_remaining"></div><br>
+            <div class="key">Module</div><div class="val last_module"></div><br>
+            <div class="key">Action</div><div class="val last_action"></div><br>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="print-panel"></div>
+    <div class="printing">
+        <div id="print_progress_bar" class="progress progress-striped">
+            <div style="width: 0%" class="progress-bar progress-bar-warning"></div>
+        </div>
+        <div id="print_status_bar" class="stat-bar progress">
+            <div class="part" id="MoveTo" style="background-color:rgba(174,77,86,255);">To Layer</div>
+            <div class="part" id="GcodeBefore" style="background-color:rgba(176,116,132,255);">Gcode Before</div>
+            <div class="part" id="WaitBefore" style="background-color:rgba(103,164,117,255);">Wait Before</div>
+            <div class="part" id="DisplayLayer" style="background-color:rgba(48,120,93,255);">Cure Layer</div>
+            <div class="part" id="WaitAfter" style="background-color:rgba(188,174,56,255);">Wait After</div>
+            <div class="part" id="GcodeAfter" style="background-color:rgba(18,143,149,255);">Gcode After</div>
+            <div class="part" id="MoveToWait" style="background-color:rgba(146,153,196,255);">Lift</div>
+            <div class="part" id="WaitAfterLift" style="background-color:rgba(158,142,87,255);">Lift Wait</div>
+        </div>
+    </div>
+    <div class="print_button text-center">
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <button class="btn btn-danger" href="/printer/stop">Stop Print</button>
+            </div>
+            <div class="col-md-6 text-center">
+                <button class="btn btn-warning" href="/printer/pause">Pause Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WIFI 密码弹窗 -->
+<div class="wifi-password" id="wifi-password">
+    <form id="wifi-connect-form">  <!-- action="/wifi/connect" method="post" -->
+        <div class="input-group">
+            <span class="input-group-addon">Enter Password</span>
+            <!-- <input type="text" class="form-control" aria-describedby="basic-addon3"> -->
+            <input name="WifiSSID" value="" class="WifiSSID-need" type="hidden">
+            <input name="WifiType" value="" class="WifiType-need" type="hidden">
+            <input name="WifiPass" value="" placeholder="Wireless Password" class="form-control wifi-pass">
+        </div>
+        <div class="wifi-password-button">
+            <button class="btn btn-default btn-xs" id="wifi-password-cancel">Cancel</button>
+            <!-- <button class="btn btn-success btn-xs" id="wifi-password-connect">Connect</button> -->
+            <input type="submit" value="Connect" class="btn btn-success btn-xs" id="wifi-password-connect">
+        </div>
+    </form>
+</div>
+
+<!-- WIFI 连接失败 -->
+<div class="wifi-password" id="wifi-break">
+    <h4>Connection failed</h4>
+    <div class="wifi-password-button">
+        <button class="btn btn-success" id="wifi-break-ok">OK</button>
+    </div>
+</div>
+
+<!-- Toggle Grid 弹窗 -->
+<div class="modal fade resin-edit-alert" tabindex="-1" role="dialog" id="help">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Help</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>Tool User Guide</h4>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3D View -->
+<div class="content">
+    <div id="view_3d" data-file=""></div>
+</div>
+
+<!-- Menu/Navi -->
+<nav class="navbar navbar-default navbar-inverse navbar-l top-nav">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand navbar-logo" href="#"><img alt="Brand" src="../static/image/Logo.png"></a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#" id="menu_item_resin" onclick="on_click_menu_item('resin');">Resin</a>
+                </li>
+                <li>
+                    <a href="#" id="menu_item_load" onclick="on_click_menu_item('load');">Load</a>
+                </li>
+                <li class="disabled">
+                    <a href="#" id="menu_item_preview" onclick="on_click_menu_item('preview');">Preview</a>
+                </li>
+                <li class="disabled">
+                    <a href="#" id="menu_item_slicing" data-toggle="modal" data-target="#slicing">Slice</a>
+                </li>
+                <li class="disabled">
+                    <a href="#" id="menu_item_print" onclick="on_click_menu_item('print');">Print</a>
+                </li>
+                <li class="disabled">
+                    <a href="#" id="menu_item_export">Export</a>
+                </li>
+                <li class="disabled">
+                    <a href="#" id="menu_item_wifi" >WiFi</a>
+                </li>
+            </ul>
+            <ul id="right_navbar" class="nav navbar-nav navbar-right top-nav-right">
+                <!-- <li>
+                    <a href="#">
+                        <img src="../static/image/connect-sm.png">
+                    </a>
+                </li> -->
+                <li class="dropdown">
+                    <a href="#" id="control-plate-tools" onclick="show_time('sidebar');">
+                        <img src="../static/image/menu-sm.png">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <ul class="nav nav-stacked">
+        <li role="presentation"></li>
+        <li role="presentation">
+            <a class="text-center" href="#" data-toggle="modal" data-target="#plate"
+               onclick="on_click_sidebar_item('plate');">
+                <div class="sidebar_img_wrapper">
+                    <img id="sidebar_plate_img" src="../static/image/plate.png"/>
+                </div>
+                <div class="sidebar_item_name">Plate</div>
+            </a>
+        </li>
+        <li role="presentation">
+            <a class="text-center" href="#" onclick="on_click_sidebar_item('tool');">
+                <div class="sidebar_img_wrapper">
+                    <img id="sidebar_tool_img" src="../static/image/setting.png"/>
+                </div>
+                <div class="sidebar_item_name">Tool</div>
+            </a>
+        </li>
+        <li role="presentation">
+            <a class="text-center" href="#" onclick="on_click_sidebar_item('support');">
+                <div class="sidebar_img_wrapper">
+                    <img id="sidebar_support_img" src="../static/image/support.png"/>
+                </div>
+                <div class="sidebar_item_name">Support</div>
+            </a>
+        </li>
+        <li role="presentation">
+            <a class="text-center" href="#" onclick="on_click_sidebar_item('operation');">
+                <div class="sidebar_img_wrapper">
+                    <img id="sidebar_operation_img" src="../static/image/operation.png"/>
+                </div>
+                <div class="sidebar_item_name">Operation</div>
+            </a>
+        </li>
+        <li role="presentation"></li>
+        <li role="presentation" class="plate-tools-footer">
+            <div class="sidebar_item_name">
+                <a class="text-center" href="#" id="toggle_grid">
+                    <u>Toggle Grid</u>
+                </a>
+            </div>
+            <div class="sidebar_item_name">
+                <a class="text-center" href="#" data-toggle="modal" data-target="#help">
+                    <u>Help</u>
+                </a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+<script src='/static/boot3/js/jquery.min.js'></script>
+<script src='/static/boot3/js/bootstrap.min.js'></script>
+
+<script src="../static/js/Tdrag.min.js"></script>
+<script src="../static/js/general.js"></script>
+
+<script src='/static/js/three.min.js'></script>
+<script src='/static/js/TrackballControls.js'></script>
+<script src="/static/js/three.dragcontrols.js"></script>
+<script src='/static/js/STLBinaryExporter.js'></script>
+<script src='/static/js/FileSaver.min.js'></script>
+<script src='/static/js/c.js'></script>
+
+<script src='/static/js/jquery.imgareaselect.dev.js'></script>
+<script src='/static/js/favico-0.3.10.min.js'></script>
+<script src='/static/js/jquery.sparkline.min.js'></script>
+<script src='/static/js/main.js'></script>
+<script src='/static/js/formula.js'></script>
+<script src='/static/js/preview.js'></script>
+
+<script src="/static/js/dp.three.js"></script>
+<script src='/static/js/dp.main.js'></script>
+</body>
+</html>
