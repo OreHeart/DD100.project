@@ -180,7 +180,6 @@
         </div>
     </form>
 </div>
-    
 
 <div class="plate_load pop_window" id="load">
     <div class="tool-close">
@@ -747,6 +746,36 @@
 </div>
 
 <!-- Menu/Navi -->
+{% macro wirelessView(WifiSSID,WifiType,Quality) %}
+<li class="wifi-items">
+    <div class="pull-left">
+        <input name="WifiSSID" value="{{WifiSSID}}" class="WifiSSID" type="hidden">
+        {% if wifi!="" %}
+            {% if wifi == WifiSSID %}
+                <span class="glyphicon glyphicon-ok" style="float:left;padding-top:3px">&nbsp;</span>
+            {% endif %}
+        {% endif %}
+        <span class="wifi-ssid">{{WifiSSID}}</span>
+    </div>
+    <div class="pull-right">
+        <input name="WifiType" value="{{WifiType}}" class="WifiType" type="hidden">
+        {% if WifiType!="" %}
+            {% if Quality >= 50 %}
+            <img src="../static/image/5.jpg">
+            {% elif Quality >= 40 %}
+            <img src="../static/image/4.jpg">
+            {% elif Quality >= 30 %}
+            <img src="../static/image/3.jpg">
+            {% elif Quality >= 10 %}
+            <img src="../static/image/2.jpg">
+            {% else %}
+            <img src="../static/image/1.jpg">
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="clearfix"></div>
+</li>
+{% endmacro %}
 <nav class="navbar navbar-default navbar-inverse navbar-l top-nav">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -768,6 +797,32 @@
                 <li>
                     <a href="#" id="menu_item_load" onclick="on_click_menu_item('load');">Load</a>
                 </li>
+                <li class="wifi-control">
+                    <a href="#" id="wifi-control" onclick="show_time('wifi');">Wi-Fi</a>
+                    <div class="wifi-container pop_window" id="wifi">
+                        <ul class="wifi">
+                            {% if Networks %}
+                                {% for network in Networks %}
+                                    {% if network.ESSID!="" %}
+                                        {{ wirelessView(network.ESSID,network.SecurityProtocol,network.QualityLevel) }}
+                                    {% endif %}
+                                {% endfor %}
+                                
+                            {% else %}
+                            
+                            {% endif %}
+                        </ul>
+                        {% if Networks %}
+                            <!-- <li class="wifi-hr"><hr></li> -->
+                            <div class="wifi-button text-center">
+                                <button class="btn btn-xs btn-default pull-left" id="wifi-cancel">Cancel</button>
+                                <button class="btn btn-xs btn-success pull-right" id="wifi-password-control">Connect</button>
+                            </div>
+                        {% else %}
+                            
+                        {% endif %}
+                    </div>
+                </li>
                 <li class="disabled">
                     <a href="#" id="menu_item_preview" onclick="on_click_menu_item('preview');">Preview</a>
                 </li>
@@ -785,11 +840,15 @@
                 </li>
             </ul>
             <ul id="right_navbar" class="nav navbar-nav navbar-right top-nav-right">
-                <!-- <li>
+                <li>
                     <a href="#">
+                        {% if rampsReconnect %}
                         <img src="../static/image/connect-sm.png">
+                        {% else %}
+                        <img src="../static/image/wifi-break.png">
+                        {% endif %}
                     </a>
-                </li> -->
+                </li>
                 <li class="dropdown">
                     <a href="#" id="control-plate-tools" onclick="show_time('sidebar');">
                         <img src="../static/image/menu-sm.png">
