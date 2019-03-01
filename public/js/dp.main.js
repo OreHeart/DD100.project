@@ -356,15 +356,6 @@ function on_edit_plate(PlateID,Path,AutoCenter,StopLayers,LowQualityLayerNumber,
     $("#ImageRotate").val(ImageRotate);
     $("#plate_edit_submit").click(function (){
         let fd = new FormData($("#plate_form")[0]);
-        /*let fd = {
-            "Path": $("#Path"+plateID).val(),
-            "ProfileID": $("#ProfileID_"+plateID).val(),
-            "AutoCenter": $("#AutoCenter_"+plateID).val(),
-            "StopLayers": $("#StopLayers_"+plateID).val(),
-            "LowQualityLayerNumber": $("#LowQualityLayerNumber_"+plateID).val(),
-            "ImageRotate": $("#ImageRotate_"+plateID).val()
-        }*/
-        console.log(PlateID);
         $.ajax({
             url: "/plate/edit/"+PlateID,
             data: fd,
