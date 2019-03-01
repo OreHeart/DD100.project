@@ -317,9 +317,7 @@ function on_click_close(modalName) {
     if (modalName === "support") {
         close_pop('#support', '#support_add_box');
         enter_mode("plate");
-    } else if(modalName === "plate"){
-        close_pop('#plate', '#plate_edit');
-    }else {
+    } else {
         close_pop('#' + modalName);
     }
 }
@@ -332,7 +330,7 @@ function enter_mode(modeName) {
 }
 
 function on_load_plate() {
-    let fd = new FormData($(".support")[0]);
+    let fd = new FormData($(".edit-page")[0]);
     $.ajax( {
         url: "/plate/add",
         data: fd,
@@ -356,6 +354,14 @@ function on_edit_plate(PlateID,Path,AutoCenter,StopLayers,LowQualityLayerNumber,
     $("#ImageRotate").val(ImageRotate);
     $("#plate_edit_submit").click(function (){
         let fd = new FormData($("#plate_form")[0]);
+        /*let fd = {
+            "Path": $("#Path"+plateID).val(),
+            "ProfileID": $("#ProfileID_"+plateID).val(),
+            "AutoCenter": $("#AutoCenter_"+plateID).val(),
+            "StopLayers": $("#StopLayers_"+plateID).val(),
+            "LowQualityLayerNumber": $("#LowQualityLayerNumber_"+plateID).val(),
+            "ImageRotate": $("#ImageRotate_"+plateID).val()
+        }*/
         $.ajax({
             url: "/plate/edit/"+PlateID,
             data: fd,
@@ -368,8 +374,6 @@ function on_edit_plate(PlateID,Path,AutoCenter,StopLayers,LowQualityLayerNumber,
         return false;
     });
 }
-
-
 
 function on_delete_plate(plateID) {
     $.ajax({
